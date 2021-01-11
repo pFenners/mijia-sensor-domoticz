@@ -164,7 +164,7 @@ class MiTemp2BtPoller:
         res = dict()
 
        
-        res[MI_TEMPERATURE] = round(int.from_bytes([data[0], data[1]], "little")/100.0, 1)
+        res[MI_TEMPERATURE] = round(int.from_bytes([data[0], data[1]], "little", signed=True)/100.0, 1)
         res[MI_HUMIDITY] = int.from_bytes([data[2]], "little")
 
         return res
