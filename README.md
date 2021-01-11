@@ -1,5 +1,9 @@
 # mijia-sensor-domoticz
 
+Adapted version of mijia-sensor-domoticz (https://github.com/pFenners/mijia-sensor-domoticz) for supporting the V2 version of the Xiaomi Mijia Bluetooth Temperature Humidity Sensor.
+
+![V1Sensor](MijiaV1.jpg) ![V2Sensor](MijiaV2.jpg)
+
 Adapted version of miflora (https://github.com/Tristan79/miflora) for the Xiaomi Mijia Bluetooth Temperature Humidity Sensor (MJ_HT_V1).
 
 The Xiaomi Mijia sensor provides temperature and humidity over BLE.

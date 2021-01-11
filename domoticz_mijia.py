@@ -1,6 +1,10 @@
 import urllib.request
 import base64
 import time
+import btlewrap
+from btlewrap.base import BluetoothBackendException
+from mijia.mitemp2_bt_poller import MiTemp2BtPoller, \
+    MI_HUMIDITY, MI_TEMPERATURE, MI_BATTERY
 from mijia.mijia_poller import MijiaPoller, \
     MI_HUMIDITY, MI_TEMPERATURE, MI_BATTERY
 
@@ -19,6 +23,13 @@ domoticzpassword = ""
 # Create virtual sensors in dummy hardware
 # type temperature & humidity
 
+try:
+    import bluepy.btle  # noqa: F401 pylint: disable=unused-import
+
+    BACKEND = btlewrap.BluepyBackend
+except ImportError:
+    BACKEND = btlewrap.GatttoolBackend
+
 
 base64string = base64.encodestring(('%s:%s' % (domoticzusername, domoticzpassword)).encode()).decode().replace('\n', '')
 
@@ -29,10 +40,14 @@ def domoticzrequest (url):
   response = urllib.request.urlopen(request)
   return response.read()
 
-def update(address,idx_temp):
-
-    poller = MijiaPoller(address)
-
+def update(address,idx_temp, version):
+    if 1 == version:
+        poller = MijiaPoller(address)
+    elif 2 == version:
+        poller = MiTemp2BtPoller(address, BACKEND)
+    else:
+        print("Unsupported Mijia sensor version\n")
+        return
 
     loop = 0
     try:
@@ -43,7 +58,10 @@ def update(address,idx_temp):
     while loop < 2 and temp == "Not set":
         print("Error reading value retry after 5 seconds...\n")
         time.sleep(5)
-        poller = MijiaPoller(address)
+        if 1 == version:
+            poller = MijiaPoller(address)
+        elif 2 == version:
+            poller = MiTemp2BtPoller(address, BACKEND)
         loop += 1
         try:
             temp = poller.parameter_value(MI_TEMPERATURE)
@@ -89,11 +107,11 @@ def update(address,idx_temp):
 	
 
 print("\n1: updating")
-update("4C:65:A8:D0:4C:98","752")
+update("A4:C1:38:A1:D5:92","752", 2)
 
-update("4C:65:A8:D0:26:D2","753")
+update("4C:65:A8:D0:26:D2","753", 1)
 
-update("4C:65:A8:D0:57:2A","754")
+update("4C:65:A8:D0:57:2A","754", 1)
 
 
 
