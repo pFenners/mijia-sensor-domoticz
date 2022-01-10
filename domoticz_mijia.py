@@ -1,6 +1,8 @@
+print("*****************")
 import urllib.request
 import base64
 import time
+import sys
 from mijia.mijia_poller import MijiaPoller, \
     MI_HUMIDITY, MI_TEMPERATURE, MI_BATTERY
 
@@ -8,7 +10,7 @@ from mijia.mijia_poller import MijiaPoller, \
 
 # Forum see: http://domoticz.com/forum/viewtopic.php?f=56&t=13306&hilit=mi+flora&start=20#p105255
 
-domoticzserver   = "127.0.0.1:8000"
+domoticzserver   = "127.0.0.1:8080"
 domoticzusername = ""
 domoticzpassword = ""
 
@@ -20,14 +22,21 @@ domoticzpassword = ""
 # type temperature & humidity
 
 
-base64string = base64.encodestring(('%s:%s' % (domoticzusername, domoticzpassword)).encode()).decode().replace('\n', '')
+#base64string = base64.encodestring(('%s:%s' % (domoticzusername, domoticzpassword)).encode()).decode().replace('\n', '')
+
+base64string = base64.encodebytes(('%s:%s' % (domoticzusername, domoticzpassword)).encode()).decode().replace('\n', '')
 
 def domoticzrequest (url):
-  print(url)
-  request = urllib.request.Request(url)
-  request.add_header("Authorization", "Basic %s" % base64string)
-  response = urllib.request.urlopen(request)
-  return response.read()
+    print(url)
+    request = urllib.request.Request(url)
+    request.add_header("Authorization", "Basic %s" % base64string)
+    try:
+        response = urllib.request.urlopen(request, timeout=10)
+        print("Calling Domoticz")
+    except timeout:
+        print("[EROOR] Domoticz API Timeout")
+        sys.exit(1)
+    return response.read()
 
 def update(address,idx_temp):
 
@@ -88,13 +97,7 @@ def update(address,idx_temp):
     domoticzrequest("http://" + domoticzserver + "/json.htm?type=command&param=udevice&idx=" + idx_temp + "&nvalue=0&svalue=" + val_temp + ";" + val_hum + ";"+ val_comfort + "&battery=" + val_bat)
 	
 
-print("\n1: updating")
-update("4C:65:A8:D0:4C:98","752")
-
-update("4C:65:A8:D0:26:D2","753")
-
-update("4C:65:A8:D0:57:2A","754")
-
-
-
-
+print("\n1: Updating SEV INT")
+update("58:2D:34:3B:7C:93","77")
+print("\n2: Updating TEMP 2")
+update("58:2D:34:3A:53:01","81")
