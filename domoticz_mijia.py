@@ -20,7 +20,7 @@ domoticzpassword = ""
 # type temperature & humidity
 
 
-base64string = base64.encodestring(('%s:%s' % (domoticzusername, domoticzpassword)).encode()).decode().replace('\n', '')
+base64string = base64.b64encode(('%s:%s' % (domoticzusername, domoticzpassword)).encode()).decode().replace('\n', '')
 
 def domoticzrequest (url):
   print(url)
